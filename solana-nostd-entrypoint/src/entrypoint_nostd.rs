@@ -16,7 +16,6 @@ use solana_program::{
     program_error::ProgramError,
     program_memory::sol_memset,
     pubkey::Pubkey,
-    program_error::ProgramError
 };
 
 #[macro_export]
@@ -943,7 +942,9 @@ impl NoStdAccountInfo {
 
     /// Tries to get a read only reference to the lamport field, failing if the field is already mutable borrowed or
     /// if 7 borrows already exist.
-    pub fn try_borrow_lamports(&self) -> Result<Ref<u64>, ProgramError> {
+    pub fn try_borrow_lamports(
+        &self,
+    ) -> Result<Ref<u64>, ProgramError> {
         let borrow_state = unsafe { &mut (*self.inner).borrow_state };
 
         // Check if mutable borrow is already taken
@@ -971,7 +972,9 @@ impl NoStdAccountInfo {
     }
 
     /// Tries to get a read only reference to the lamport field, failing if the field is already borrowed in any form.
-    pub fn try_borrow_mut_lamports(&self) -> Result<RefMut<u64>, ProgramError> {
+    pub fn try_borrow_mut_lamports(
+        &self,
+    ) -> Result<RefMut<u64>, ProgramError> {
         let borrow_state = unsafe { &mut (*self.inner).borrow_state };
 
         // Check if any borrow (mutable or immutable) is already taken for lamports
@@ -1030,7 +1033,9 @@ impl NoStdAccountInfo {
     }
 
     /// Tries to get a read only reference to the data field, failing if the field is already borrowed in any form.
-    pub fn try_borrow_mut_data(&self) -> Result<RefMut<[u8]>, ProgramError> {
+    pub fn try_borrow_mut_data(
+        &self,
+    ) -> Result<RefMut<[u8]>, ProgramError> {
         let borrow_state = unsafe { &mut (*self.inner).borrow_state };
 
         // Check if any borrow (mutable or immutable) is already taken for data
@@ -1095,9 +1100,7 @@ impl NoStdAccountInfo {
         new_len: usize,
         zero_init: bool,
     ) -> Result<(), ProgramError> {
-        let Some(mut data) = self.try_borrow_mut_data() else {
-            return Err(ProgramError::AccountBorrowFailed);
-        };
+        let mut data = self.try_borrow_mut_data()?;
         let old_len = data.len();
 
         // Return early if length hasn't changed
