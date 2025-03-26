@@ -42,7 +42,10 @@ macro_rules! basic_panic_impl {
     () => {
         #[cfg(target_os = "solana")]
         #[no_mangle]
-        fn custom_panic(_info: &core::panic::PanicInfo<'_>) {
+        fn custom_panic(info: &core::panic::PanicInfo<'_>) {
+            if let Some(location) = info.location() {
+                $crate::__private::sol_log(location.file());
+            }
             $crate::__private::sol_log("panicked!");
         }
     };
